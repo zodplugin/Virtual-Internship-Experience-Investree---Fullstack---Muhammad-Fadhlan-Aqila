@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\PassportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ArticlesController;
+use App\Http\Controllers\PassportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('v1/login',[PassportController::class,'login']);
 Route::middleware('auth:api')->get('v1/all',[PassportController::class,'users']);
+Route::post('v1/articles/create',[ArticlesController::class,'createAPI']);
