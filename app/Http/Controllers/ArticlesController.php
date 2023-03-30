@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Articles;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ArticlesController extends Controller
@@ -86,9 +87,15 @@ class ArticlesController extends Controller
 
 
     //API
-
+    public function listAll(){
+        $data = Articles::all();
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menampilkan data',
+            'data' => $data,
+        ]);
+    }
     public function createAPI(Request $request){
-        $request['user_id'] = 1;
         $data = Validator::make($request->all(),[
             'title' => 'required',
             'image' => 'required|image|mimes:png,jpg,gif,svg,jpeg|max:2048',
@@ -109,12 +116,91 @@ class ArticlesController extends Controller
             'image' => $imgName,
             'content' => $request->content,
             'category_id' => $request->category_id,
-            'user_id' => $request->user_id,
+            'user_id' => Auth()->id(),
         ]);
         return response()->json([
             'success' => true,
             'message' => "Article Berhasil Dibuat",
             'data' => $result
+        ]);
+    }
+
+    public function showAPI($id){
+        $data = Articles::find($id);
+        if (!$data){
+            return response()->json([
+                'message' => 'Data tidak dapat ditemukan'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menampilkan data',
+            'data' => $data,
+        ]);
+    }
+
+    public function updateAPI(Request $request, $id){
+
+        $articles = Articles::find($id);
+        $validator = Validator::make($request->all(),[
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                $validator->errors(),
+                'result' => $request->all()
+            ]);
+        }
+
+        if ($request->hasFile('image') && $request->category_id){
+            $img = $request->file('image');
+            $imgName = $img->hashName();
+            $img->storeAs('public/images/article/',$imgName);
+            Storage::delete('public/images/article',$articles->image);
+
+            $articles->update([
+                'title' => $request->title,
+                'image' => $imgName,
+                'content' => $request->content,
+                'category_id' => $request->category_id
+            ]);
+        }
+        else if($request->hasFile('image')){
+            $img = $request->file('image');
+            $imgName = $img->hashName();
+            $img->storeAs('public/images/article/',$imgName);
+            Storage::delete('public/images/article',$articles->image);
+
+            $articles->update([
+                'title' => $request->title,
+                'image' => $imgName,
+                'content' => $request->content,
+            ]);
+        }else{
+            $articles->update([
+                'title' => $request->title,
+                'content' => $request->content,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengupdate data',
+            'data' => $articles,
+        ]);
+
+    }
+
+    public function deleteAPI($id){
+        $article = Articles::find($id);
+        Storage::delete('public/images/articles/'. $article->image);
+        $article->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menghapus data',
         ]);
     }
 }
