@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Articles;
+use App\Models\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -16,7 +17,10 @@ class ArticlesController extends Controller
      */
     public function index()
     {
-
+        $article = Articles::with('category')->where('user_id',auth()->id())->get();
+        return view('admin.articles.index',[
+            'articles' => $article
+        ]);
     }
 
     /**
@@ -26,7 +30,10 @@ class ArticlesController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Categories::all();
+        return view('admin.articles.create',[
+            'categories' => $categories
+        ]);
     }
 
     /**
@@ -37,7 +44,28 @@ class ArticlesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       $request->validate([
+            'title' => 'required',
+            'image' => 'required|image|mimes:png,jpg,gif,svg,jpeg|max:2048',
+            'content' => 'required',
+            'category_id' => 'required'
+        ]);
+
+        $img = $request->file('image');
+        $imgName = $img->hashName();
+        $img->storeAs('public/images/article/',$imgName);
+
+        Articles::create([
+            'title' => $request->title,
+            'image' => $imgName,
+            'content' => $request->content,
+            'category_id' => $request->category_id,
+            'user_id' => Auth()->id(),
+        ]);
+
+        return redirect()->route('articles.index')->with('success','Data sudah ditambahkan');
+
+
     }
 
     /**
