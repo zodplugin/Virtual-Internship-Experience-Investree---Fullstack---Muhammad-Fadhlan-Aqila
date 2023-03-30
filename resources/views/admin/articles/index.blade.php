@@ -14,7 +14,7 @@
                     <th scope="col" width="500px">Content</th>
                     <th scope="col">Category</th>
                     <th scope="col">Image</th>
-                    <th>Action</th>
+                    <th width="300px">Action</th>
                   </tr>
             </thead>
             <tbody>
@@ -26,10 +26,13 @@
                         <td>{{ $article->category->name}}</td>
                         <td><img src={{asset('storage/images/article/'. $article->image)}} alt="" srcset="" width='200px'></td>
                         <td>
-                            <a href={{route('articles.show', $article->id)}} class="btn btn-primary"><i class="fas fa fa-eye"></i></a>
-                            <a href={{route('articles.edit', $article->id)}} class="btn btn-warning"><i class="fas fa fa-pen"></i> </a>
-                            <a href={{route('articles.destroy', $article->id)}} class="btn btn-danger"> <i class="fas fa fa-trash"></i></a>
-
+                            <form action={{route('articles.destroy', $article->id)}} action="POST">
+                                <a href={{route('articles.show', $article->id)}} class="btn btn-primary"><i class="fas fa fa-eye"></i></a>
+                                <a href={{route('articles.edit', $article->id)}} class="btn btn-warning"><i class="fas fa fa-pen"></i> </a>
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger"> <i class="fas fa fa-trash"></i></button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

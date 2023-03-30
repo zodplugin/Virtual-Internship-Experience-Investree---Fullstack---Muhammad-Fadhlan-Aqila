@@ -85,9 +85,13 @@ class ArticlesController extends Controller
      * @param  \App\Models\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function edit(Articles $articles)
+    public function edit(Articles $articles, $id)
     {
-        //
+        $data = $articles::find($id);
+        return view('admin.articles.edit',[
+            'article' => $data,
+            'categories' => Categories::all(),
+        ]);
     }
 
     /**
@@ -97,9 +101,47 @@ class ArticlesController extends Controller
      * @param  \App\Models\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Articles $articles)
+    public function update(Request $request, Articles $articles, $id)
     {
-        //
+        $data = $articles::findOrFail($id);
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+            'category_id' => 'required'
+        ]);
+
+        if ($request->hasFile('image') && $request->category_id){
+            $img = $request->file('image');
+            $imgName = $img->hashName();
+            $img->storeAs('public/images/article/',$imgName);
+            Storage::delete('public/images/article',$data->image);
+
+            $data->update([
+                'title' => $request->title,
+                'image' => $imgName,
+                'content' => $request->content,
+                'category_id' => $request->category_id
+            ]);
+        }
+        else if($request->hasFile('image')){
+            $img = $request->file('image');
+            $imgName = $img->hashName();
+            $img->storeAs('public/images/article/',$imgName);
+            Storage::delete('public/images/article',$data->image);
+
+            $data->update([
+                'title' => $request->title,
+                'image' => $imgName,
+                'content' => $request->content,
+            ]);
+        }else{
+            $data->update([
+                'title' => $request->title,
+                'content' => $request->content,
+            ]);
+        }
+
+        return redirect()->route('articles.index')->with('success','Data berhasil diubah');
     }
 
     /**
@@ -108,9 +150,14 @@ class ArticlesController extends Controller
      * @param  \App\Models\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Articles $articles)
+    public function destroy(Articles $articles, $id)
     {
-        //
+        // $data = $articles::findOrFail($id);
+        // return ddd($data);
+        // Storage::delete('public/images/articles/'. $data->image);
+        // $data->delete();
+
+        return redirect()->route('articles.index')->with('success','Data berhasil dihapus');
     }
 
 
