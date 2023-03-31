@@ -74,9 +74,12 @@ class ArticlesController extends Controller
      * @param  \App\Models\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function show(Articles $articles)
+    public function show(Articles $articles, $id)
     {
-        //
+        $data = $articles::with('category')->findOrFail($id);
+        return view('admin.articles.show',[
+            'articles' => $data
+        ]);
     }
 
     /**
@@ -152,10 +155,9 @@ class ArticlesController extends Controller
      */
     public function destroy(Articles $articles, $id)
     {
-        // $data = $articles::findOrFail($id);
-        // return ddd($data);
-        // Storage::delete('public/images/articles/'. $data->image);
-        // $data->delete();
+        $data = $articles::findOrFail($id);
+        Storage::delete('public/images/articles/'. $data->image);
+        $data->delete();
 
         return redirect()->route('articles.index')->with('success','Data berhasil dihapus');
     }

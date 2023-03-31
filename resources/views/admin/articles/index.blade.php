@@ -26,11 +26,11 @@
                         <td>{{ $article->category->name}}</td>
                         <td><img src={{asset('storage/images/article/'. $article->image)}} alt="" srcset="" width='200px'></td>
                         <td>
-                            <form action={{route('articles.destroy', $article->id)}} action="POST">
+                            <form action={{route('articles.destroy', $article->id)}} method="post">
                                 <a href={{route('articles.show', $article->id)}} class="btn btn-primary"><i class="fas fa fa-eye"></i></a>
                                 <a href={{route('articles.edit', $article->id)}} class="btn btn-warning"><i class="fas fa fa-pen"></i> </a>
                                 @csrf
-                                @method('DELETE')
+                                @method('delete')
                                 <button type="submit" class="btn btn-danger"> <i class="fas fa fa-trash"></i></button>
                             </form>
                         </td>

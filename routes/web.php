@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\HomeController::class, 'welcome']);
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::resource('articles',ArticlesController::class)->middleware('auth');
+Route::get('/articles/{id}',[App\Http\Controllers\HomeController::class, 'show'])->name('articles.blog');
+Route::resource('admin/articles',ArticlesController::class)->middleware('auth');

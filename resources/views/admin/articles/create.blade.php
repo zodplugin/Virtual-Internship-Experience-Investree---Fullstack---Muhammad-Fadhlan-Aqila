@@ -5,8 +5,7 @@
     <h2>Tambah Artikel</h2>
     <br>
     <form action="{{route('articles.store')}}" method="post" enctype="multipart/form-data">
-        @crsf
-
+        @csrf
         <input type="hidden" name="user_id" value={{Auth()->id()}}>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Title</label>
